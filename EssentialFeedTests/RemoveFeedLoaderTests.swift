@@ -97,6 +97,19 @@ class RemoteFeedLoaderTests: XCTestCase {
         }
     }
     
+    func test_load_foesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
+        let url = URL(string: "http://any-url.com")!
+        let client = HTTPClientSpy()
+        var sut: RemoteFeedLoader? = RemoteFeedLoader(url: url, client: client)
+        
+        var capturedResult = [RemoteFeedLoader.Result]()
+        sut?.load { capturedResult.append($0) }
+        
+        sut = nil
+        client.complete(withStatusCode: 200, data: makeItemsJSON([]))
+        XCTAssert(capturedResult.isEmpty)
+    }
+    
     //MARK: - Helpers
     
     private func makeSUT(url: URL = URL(string: "https://a-given-url.com")!, file: StaticString = #file, line: UInt = #line) -> (sut: RemoteFeedLoader, client: HTTPClientSpy) {
@@ -142,11 +155,11 @@ class RemoteFeedLoaderTests: XCTestCase {
     }
     
     private func expect(_ sut: RemoteFeedLoader, toCompleteWith result: RemoteFeedLoader.Result, when action: () -> Void, file: StaticString = #filePath, line: UInt = #line) {
-        var capturedError = [RemoteFeedLoader.Result]()
-        sut.load { capturedError.append($0) }
+        var capturedResult = [RemoteFeedLoader.Result]()
+        sut.load { capturedResult.append($0) }
         
         action()
-        XCTAssertEqual(capturedError, [result], file: file, line: line)
+        XCTAssertEqual(capturedResult, [result], file: file, line: line)
     }
     
     private class HTTPClientSpy: HTTPClient {
