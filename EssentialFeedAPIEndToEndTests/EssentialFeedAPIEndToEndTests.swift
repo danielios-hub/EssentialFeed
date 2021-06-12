@@ -11,8 +11,6 @@ import EssentialFeed
 class EssentialFeedAPIEndToEndTests: XCTestCase {
 
     func test_endToEndTestServerGETFeedResult_matchesFixedTestAccountData() {
-        
-        
         switch getFeedResult() {
         case let .success(items):
             XCTAssertEqual(items.count, 8, "Expected 8 items i n the test account feed")
@@ -25,7 +23,6 @@ class EssentialFeedAPIEndToEndTests: XCTestCase {
         default:
             XCTFail("expected successful feed result. got no result instead")
         }
-        
     }
     
     //MARK: - Helpers
@@ -47,6 +44,7 @@ class EssentialFeedAPIEndToEndTests: XCTestCase {
         wait(for: [exp], timeout: 5)
         return receivedResult
     }
+    
     func expectedItem(at index: Int) -> FeedItem {
         return FeedItem(
             id: id(at: index),
